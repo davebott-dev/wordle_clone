@@ -3,6 +3,7 @@ import './App.css'
 
 function App() {
   const [grid,setGrid] = useState(Array(30).fill(null));
+  const [keyboard, setKeyboard] = useState(Array(28).fill(null));
 
   return (
     <>
