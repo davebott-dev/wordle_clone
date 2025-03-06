@@ -73,12 +73,21 @@ main {
 }
 .keyboard{
   display: grid;
-  grid-template-columns: repeat(10, 60px);
-  grid-template-rows: repeat(3,50px);
-  grid-gap: 5px;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(3,1fr);
+  grid-gap: 8px;
+}
+.n9 {
+  grid-column: 10/12;
+}
+.n10 {
+  grid-column: 2/3;
 }
 .n19{
-  grid-column: 1/2;
+  grid-column: 1/3;
+}
+.n27 {
+  grid-column: 10/12;
 }
 .key{
   display: flex;
@@ -89,13 +98,37 @@ main {
   background: #d3d6da;
   border-radius: 4px;
   color: #000;
+  padding: 8px;
   font-weight: bold;
+  cursor: pointer;
 }
 .cell{ 
   border: 2px solid #d3d6da;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: small;
+  padding: 10px;
+}
+footer>div:not(footer>div:nth-child(1)):before {
+  content: "|"
+}
+footer>div:nth-child(7) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+a{
+  text-decoration: none;
+  color: black;
 }
 
 @media (prefers-color-scheme: light) {
