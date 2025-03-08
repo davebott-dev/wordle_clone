@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { IconButton, Drawer, Stack, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerList from "./components/Drawer";
@@ -12,51 +12,56 @@ import "./App.css";
 function App() {
   const [grid, setGrid] = useState(Array(30).fill(null));
   const [open, setOpen] = useState(false);
-  const [word, setWord] = useState([]);
-  const [n, setN] =useState(0);
+  const [word, setWord] = useState("");
+  const [n, setN] = useState(0);
   const keys = [
-    "Q",
-    "W",
-    "E",
-    "R",
-    "T",
-    "Y",
-    "U",
-    "I",
-    "O",
-    "P",
-    "A",
-    "S",
-    "D",
-    "F",
-    "G",
-    "H",
-    "J",
-    "K",
-    "L",
-    "ENTER",
-    "Z",
-    "X",
-    "C",
-    "V",
-    "B",
-    "N",
-    "M",
-    "BACK",
+    "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
+    "A", "S", "D", "F", "G", "H", "J", "K", "L", "ENTER",
+    "Z", "X", "C", "V", "B", "N", "M", "BACK"
   ];
   const apiURL = "https://random-word-api.herokuapp.com/word?length=5";
 
-  useEffect(()=> {
-    const randomWord = async()=> {
+  useEffect(() => {
+    const fetchRandomWord = async () => {
       const response = await fetch(apiURL);
       const data = await response.json();
       setWord(data[0]);
-    }
-    randomWord();
-  },[]);
-  
+    };
+    fetchRandomWord();
+  }, []);
+
   const toggleDrawer = (newOpen) => {
     setOpen(newOpen);
+  };
+
+  const handleKeyClick = (key) => {
+    if (key === "ENTER") {
+      if (n % 5 === 0 && n > 0) {
+        setN(n + 1);
+      }
+      return;
+    }
+
+    if (key === "BACK") {
+      if (n > 0) {
+        setGrid((prev) => {
+          const newGrid = [...prev];
+          newGrid[n - 1] = null;
+          return newGrid;
+        });
+        setN(n - 1);
+      }
+      return;
+    }
+
+    if (n < 30) {
+      setGrid((prev) => {
+        const newGrid = [...prev];
+        newGrid[n] = key;
+        return newGrid;
+      });
+      setN(n + 1);
+    }
   };
 
   return (
@@ -80,53 +85,19 @@ function App() {
 
       <main>
         <div className="gridContainer">
-          {grid.map((cell, index) => {
-            return (
-              <div key={index} className="cell">
-                {cell}
-              </div>
-            );
-          })}
+          {grid.map((cell, index) => (
+            <div key={index} className="cell">
+              {cell}
+            </div>
+          ))}
         </div>
 
         <div className="keyboard">
-          {keys.map((key, index) => {
-              const keyClick = (i) => {
-                console.log(n)
-                if(n>0 && n%4==0 ) {
-                  if(i==19) {
-                    setN(5);
-                  }
-                  return;
-                }
-                if(n>0 && n%4==0 && i!==27) return;
-                setGrid((prev)=> {
-                  const newGrid = [...prev];
-                  if(i !==19 && i!==27) {
-                  newGrid[n]=key;
-                  return newGrid;
-                } 
-                if(i==27 && n>0) {
-                  newGrid[n-1] =null;
-                  return newGrid;
-                }
-                return prev;
-                });   
-                if(i!==19 && i!==27){
-                  setN((prev)=>prev+1);
-                }
-                if(i==27 && n>0){
-                  setN((prev)=>prev-1);
-                }
-              }
-
-              
-            return (
-              <div key={index} className={`key n${index}`} onClick={()=>keyClick(index)} >
-                {key}
-              </div>
-            );
-          })}
+          {keys.map((key, index) => (
+            <div key={index} className={`key n${index}`} onClick={() => handleKeyClick(key)}>
+              {key}
+            </div>
+          ))}
         </div>
       </main>
 
@@ -135,30 +106,25 @@ function App() {
           <a href="https://www.nytco.com/">© 2025 The New York Times Company</a>
         </div>
         <div>
-          {" "}
-          <a href="https://www.nytimes.com/">NYTimes.com</a>{" "}
+          <a href="https://www.nytimes.com/">NYTimes.com</a>
         </div>
         <div>
-          {" "}
-          <a href="https://www.nytimes.com/sitemap/">Sitemap</a>{" "}
+          <a href="https://www.nytimes.com/sitemap/">Sitemap</a>
         </div>
         <div>
-          {" "}
           <a href="https://help.nytimes.com/hc/en-us/articles/10940941449492-The-New-York-Times-Company-Privacy-Policy">
             Privacy Policy
-          </a>{" "}
+          </a>
         </div>
         <div>
-          {" "}
           <a href="https://help.nytimes.com/hc/en-us/articles/115014893428-Terms-of-Service">
             Terms of Service
-          </a>{" "}
+          </a>
         </div>
         <div>
-          {" "}
           <a href="https://help.nytimes.com/hc/en-us/articles/115014893968-Terms-of-Sale">
             Terms of Sale
-          </a>{" "}
+          </a>
         </div>
         <div>
           <GitHubIcon sx={{ fontSize: 20 }} />
