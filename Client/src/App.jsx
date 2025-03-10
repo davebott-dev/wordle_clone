@@ -10,22 +10,23 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import "./App.css";
 
 function App() {
-  const [grid, setGrid] = useState(Array(30).fill(null));
+  const [grid, setGrid] = useState(Array(30).fill(null)); // 30 cells (6 rows * 5 columns)
   const [open, setOpen] = useState(false);
   const [word, setWord] = useState("");
-  const [n, setN] = useState(0);
+  const [n, setN] = useState(0); // Keeps track of the current cell index
   const keys = [
     "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
     "A", "S", "D", "F", "G", "H", "J", "K", "L", "ENTER",
     "Z", "X", "C", "V", "B", "N", "M", "BACK"
   ];
+
   const apiURL = "https://random-word-api.herokuapp.com/word?length=5";
 
   useEffect(() => {
     const fetchRandomWord = async () => {
       const response = await fetch(apiURL);
       const data = await response.json();
-      setWord(data[0]);
+      setWord(data[0].toUpperCase());
     };
     fetchRandomWord();
   }, []);
@@ -35,32 +36,54 @@ function App() {
   };
 
   const handleKeyClick = (key) => {
-    if (key === "ENTER") {
-      if (n % 5 === 0 && n > 0) {
-        setN(n + 1);
-      }
-      return;
-    }
+    const currentRow = Math.floor(n / 5); // Get current row based on 'n'
+    const startOfRow = currentRow * 5; // The starting index of the current row
+    const endOfRow = startOfRow + 5; // The ending index of the current row
 
     if (key === "BACK") {
-      if (n > 0) {
+      // Handle Backspace
+      if (n > startOfRow) { // Prevent deleting past the start of the row
         setGrid((prev) => {
           const newGrid = [...prev];
-          newGrid[n - 1] = null;
+          newGrid[n - 1] = null; // Set the current cell to null
           return newGrid;
         });
-        setN(n - 1);
+        setN(n - 1); // Move the pointer back
       }
       return;
     }
 
-    if (n < 30) {
+    if (key === "ENTER") {
+      console.log(n,endOfRow);
+      console.log(currentRow)
+      console.log(Math.floor(4/5))
+      // Handle Enter key
+      if (n === endOfRow) { // Only allow if row is complete
+        const guess = grid.slice(startOfRow, endOfRow).join("");
+        console.log("Your guess:", guess);
+
+        if (guess === word) {
+          alert("🎉 Congratulations! You guessed the word!");
+        }
+        setN(n); // Prevent further input until the next row
+      }
+      return;
+    }
+
+    // Prevent adding letters if grid is full (30 cells)
+    if (n >= 30) {
+      return;
+    }
+
+    // Handle regular letter input
+    if (n < endOfRow) {
+      // Only allow typing if the current row is not yet full
       setGrid((prev) => {
         const newGrid = [...prev];
-        newGrid[n] = key;
+        newGrid[n] = key; // Update the specific cell
         return newGrid;
       });
-      setN(n + 1);
+      setN(n + 1); // Move the pointer to the next cell
     }
   };
 
@@ -94,7 +117,11 @@ function App() {
 
         <div className="keyboard">
           {keys.map((key, index) => (
-            <div key={index} className={`key n${index}`} onClick={() => handleKeyClick(key)}>
+            <div
+              key={index}
+              className={`key n${index}`}
+              onClick={() => handleKeyClick(key)}
+            >
               {key}
             </div>
           ))}
