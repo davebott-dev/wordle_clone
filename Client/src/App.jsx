@@ -10,14 +10,40 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import "./App.css";
 
 function App() {
-  const [grid, setGrid] = useState(Array(30).fill(null)); // 30 cells (6 rows * 5 columns)
+  const [grid, setGrid] = useState(Array(30).fill(null));
   const [open, setOpen] = useState(false);
   const [word, setWord] = useState("");
-  const [n, setN] = useState(0); // Keeps track of the current cell index
+  const [n, setN] = useState(0);
+  const [isEnterClicked, setIsEnterClicked] = useState(false);
   const keys = [
-    "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
-    "A", "S", "D", "F", "G", "H", "J", "K", "L", "ENTER",
-    "Z", "X", "C", "V", "B", "N", "M", "BACK"
+    "Q",
+    "W",
+    "E",
+    "R",
+    "T",
+    "Y",
+    "U",
+    "I",
+    "O",
+    "P",
+    "A",
+    "S",
+    "D",
+    "F",
+    "G",
+    "H",
+    "J",
+    "K",
+    "L",
+    "ENTER",
+    "Z",
+    "X",
+    "C",
+    "V",
+    "B",
+    "N",
+    "M",
+    "BACK",
   ];
 
   const apiURL = "https://random-word-api.herokuapp.com/word?length=5";
@@ -36,54 +62,57 @@ function App() {
   };
 
   const handleKeyClick = (key) => {
-    const currentRow = Math.floor(n / 5); // Get current row based on 'n'
-    const startOfRow = currentRow * 5; // The starting index of the current row
-    const endOfRow = startOfRow + 5; // The ending index of the current row
+    const currentRow = Math.floor(n / 5);
+    const startOfRow = currentRow * 5;
+    const endOfRow = startOfRow + 5;
 
     if (key === "BACK") {
-      // Handle Backspace
-      if (n > startOfRow) { // Prevent deleting past the start of the row
+      if (n > startOfRow) {
         setGrid((prev) => {
           const newGrid = [...prev];
-          newGrid[n - 1] = null; // Set the current cell to null
+          newGrid[n - 1] = null;
           return newGrid;
         });
-        setN(n - 1); // Move the pointer back
+        setN(n - 1);
       }
       return;
     }
 
     if (key === "ENTER") {
-      console.log(n,endOfRow);
-      console.log(currentRow)
-      console.log(Math.floor(4/5))
-      // Handle Enter key
-      if (n === endOfRow) { // Only allow if row is complete
-        const guess = grid.slice(startOfRow, endOfRow).join("");
+      console.log(n);
+      console.log(currentRow, startOfRow, endOfRow);
+      setIsEnterClicked(true);
+      if (n === startOfRow) {
+        const guess = grid.slice(startOfRow - 5, startOfRow).join("");
         console.log("Your guess:", guess);
 
         if (guess === word) {
           alert("🎉 Congratulations! You guessed the word!");
         }
-        setN(n); // Prevent further input until the next row
+        setN(startOfRow);
       }
       return;
     }
 
-    // Prevent adding letters if grid is full (30 cells)
-    if (n >= 30) {
+    if (
+      n >= 30 ||
+      (n == 5 && !isEnterClicked) ||
+      (n == 10 && !isEnterClicked) ||
+      (n == 15 && !isEnterClicked) ||
+      (n == 20 && !isEnterClicked) ||
+      (n == 25 && !isEnterClicked) 
+    ) {
       return;
     }
 
-    // Handle regular letter input
     if (n < endOfRow) {
-      // Only allow typing if the current row is not yet full
+      setIsEnterClicked(false);
       setGrid((prev) => {
         const newGrid = [...prev];
-        newGrid[n] = key; // Update the specific cell
+        newGrid[n] = key;
         return newGrid;
       });
-      setN(n + 1); // Move the pointer to the next cell
+      setN(n + 1);
     }
   };
 
@@ -155,7 +184,9 @@ function App() {
         </div>
         <div>
           <GitHubIcon sx={{ fontSize: 20 }} />
-          <a href="https://github.com/davebott-dev/wordle_clone">Made with ❤️ by David Bottenberg</a>
+          <a href="https://github.com/davebott-dev/wordle_clone">
+            Made with ❤️ by David Bottenberg
+          </a>
         </div>
       </footer>
     </>
