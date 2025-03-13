@@ -15,6 +15,7 @@ function App() {
   const [word, setWord] = useState("");
   const [n, setN] = useState(0);
   const [isEnterClicked, setIsEnterClicked] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
   const keys = [
     "Q",
     "W",
@@ -55,7 +56,7 @@ function App() {
       setWord(data[0].toUpperCase());
     };
     fetchRandomWord();
-  }, []);
+  }, [isGameOver]);
 
   const toggleDrawer = (newOpen) => {
     setOpen(newOpen);
@@ -79,17 +80,51 @@ function App() {
     }
 
     if (key === "ENTER") {
-      console.log(n);
-      console.log(currentRow, startOfRow, endOfRow);
       setIsEnterClicked(true);
       if (n === startOfRow) {
         const guess = grid.slice(startOfRow - 5, startOfRow).join("");
         console.log("Your guess:", guess);
+        console.log("Target Word:", word);
+
+        let guessObject = {};
+        let wordObject = {};
+
+        const guessArray = guess.split("");
+        const wordArray = word.split("");
+        
+        // // If a letter is in the word but in the wrong position, mark it as yellow
+        // // If a letter is in the correct position, mark it as green
+        // guessArray.forEach((letter, index) => {
+        //   if (wordArray[index] === letter) {
+        //     guessObject[letter] = "green";
+        //     wordObject[letter] = "green";
+        //   } else if (wordArray.includes(letter)) {
+        //     guessObject[letter] = "yellow";
+        //     wordObject[letter] = "yellow";
+        //   } else {
+        //     guessObject[letter] = "gray";
+        //     wordObject[letter] = "gray";
+        //   }
+        // });
+        // // If a letter is not in the word, mark it as gray
+        // wordArray.forEach((letter) => {
+        //   if (!guessArray.includes(letter)) {
+        //     wordObject[letter] = "gray";
+        //   }
+        // });
+        
+
+        console.log("Guess Object:", guessObject);
+        console.log("Word Object:", wordObject);
+
+        setN(startOfRow);
 
         if (guess === word) {
           alert("🎉 Congratulations! You guessed the word!");
+          setGrid(Array(30).fill(null));
+          setN(0);
+          setIsGameOver(true);
         }
-        setN(startOfRow);
       }
       return;
     }
@@ -107,6 +142,7 @@ function App() {
 
     if (n < endOfRow) {
       setIsEnterClicked(false);
+      setIsGameOver(false);
       setGrid((prev) => {
         const newGrid = [...prev];
         newGrid[n] = key;
