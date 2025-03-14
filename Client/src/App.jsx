@@ -66,7 +66,7 @@ function App() {
     const currentRow = Math.floor(n / 5);
     const startOfRow = currentRow * 5;
     const endOfRow = startOfRow + 5;
-
+  
     if (key === "BACK") {
       if (n > startOfRow) {
         setGrid((prev) => {
@@ -75,71 +75,102 @@ function App() {
           return newGrid;
         });
         setN(n - 1);
+      } else if (n === startOfRow) {
+        setIsEnterClicked(false); 
       }
       return;
     }
-
+  
     if (key === "ENTER") {
       setIsEnterClicked(true);
       if (n === startOfRow) {
         const guess = grid.slice(startOfRow - 5, startOfRow).join("");
         console.log("Your guess:", guess);
         console.log("Target Word:", word);
-
+  
         let guessObject = {};
-        let wordObject = {};
-
+  
         const guessArray = guess.split("");
         const wordArray = word.split("");
         
-        // // If a letter is in the word but in the wrong position, mark it as yellow
-        // // If a letter is in the correct position, mark it as green
-        // guessArray.forEach((letter, index) => {
-        //   if (wordArray[index] === letter) {
-        //     guessObject[letter] = "green";
-        //     wordObject[letter] = "green";
-        //   } else if (wordArray.includes(letter)) {
-        //     guessObject[letter] = "yellow";
-        //     wordObject[letter] = "yellow";
-        //   } else {
-        //     guessObject[letter] = "gray";
-        //     wordObject[letter] = "gray";
-        //   }
-        // });
-        // // If a letter is not in the word, mark it as gray
-        // wordArray.forEach((letter) => {
-        //   if (!guessArray.includes(letter)) {
-        //     wordObject[letter] = "gray";
-        //   }
-        // });
-        
-
+        guessArray.forEach((letter, index) => {
+            if (wordArray[index] === letter) {
+            guessObject[letter] = "green";
+            console.log(index+startOfRow-5, "green", letter);
+            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            const keyIndex = keys.indexOf(letter);
+            const keyCell = document.querySelector(`.n${keyIndex}`);
+            keyCell.classList.remove("keyYellow", "keyGray");
+            keyCell.classList.add("keyGreen");
+            cell.classList.remove("yellow", "gray");
+            cell.classList.add("green");
+          } else if (wordArray.includes(letter)) {
+            guessObject[letter] = "yellow";
+            console.log(index+startOfRow-5, "yellow", letter);
+            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            const keyIndex = keys.indexOf(letter);
+            const keyCell = document.querySelector(`.n${keyIndex}`);
+            keyCell.classList.remove("keyGray");
+            keyCell.classList.add("keyYellow");
+            cell.classList.remove("gray");
+            cell.classList.add("yellow");
+          } else {
+            guessObject[letter] = "gray";
+            console.log(index+startOfRow-5, "gray", letter);
+            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            const keyIndex = keys.indexOf(letter);
+            const keyCell = document.querySelector(`.n${keyIndex}`);
+            keyCell.classList.add("keyGray");
+            cell.classList.add("gray");
+          }
+        });
+  
         console.log("Guess Object:", guessObject);
-        console.log("Word Object:", wordObject);
-
+  
         setN(startOfRow);
-
+  
         if (guess === word) {
           alert("🎉 Congratulations! You guessed the word!");
           setGrid(Array(30).fill(null));
+          const cells = document.querySelectorAll(".cell");
+          cells.forEach((cell) => {
+            cell.classList.remove("green", "yellow", "gray");
+          });
+          const keyCells = document.querySelectorAll(".key");
+          keyCells.forEach((keyCell) => {
+            keyCell.classList.remove("green", "yellow", "gray");
+          });
+          setN(0);
+          setIsGameOver(true);
+        } else if (n >= 30) {
+          alert("Game Over! The word was: " + word);
+          setGrid(Array(30).fill(null));
+          const cells = document.querySelectorAll(".cell");
+          cells.forEach((cell) => {
+            cell.classList.remove("green", "yellow", "gray");
+          });
+          const keyCells = document.querySelectorAll(".key");
+          keyCells.forEach((keyCell) => {
+            keyCell.classList.remove("green", "yellow", "gray");
+          });
           setN(0);
           setIsGameOver(true);
         }
       }
       return;
     }
-
+  
     if (
       n >= 30 ||
-      (n == 5 && !isEnterClicked) ||
-      (n == 10 && !isEnterClicked) ||
-      (n == 15 && !isEnterClicked) ||
-      (n == 20 && !isEnterClicked) ||
-      (n == 25 && !isEnterClicked) 
+      (n == 5 && !isEnterClicked && key === "BACK") ||
+      (n == 10 && !isEnterClicked && key === "BACK") ||
+      (n == 15 && !isEnterClicked && key === "BACK") ||
+      (n == 20 && !isEnterClicked && key === "BACK") ||
+      (n == 25 && !isEnterClicked && key === "BACK") 
     ) {
       return;
     }
-
+  
     if (n < endOfRow) {
       setIsEnterClicked(false);
       setIsGameOver(false);
@@ -174,7 +205,7 @@ function App() {
       <main>
         <div className="gridContainer">
           {grid.map((cell, index) => (
-            <div key={index} className="cell">
+            <div key={index} className={`cell cell${index}`}>
               {cell}
             </div>
           ))}

@@ -104,6 +104,7 @@ main {
 }
 .cell{ 
   border: 2px solid #d3d6da;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,6 +130,31 @@ footer>div:nth-child(7) {
 a{
   text-decoration: none;
   color: black;
+}
+.green, .keyGreen {
+  background-color: #538d4e;
+  color: white;
+}
+.yellow, .keyYellow {
+  background-color: #b59f3b;
+  color: white;
+}
+.gray, .keyGray {
+  background-color: #3a3a3c;
+  color: white;
+}
+/* figure out how to make a flipping animation for the grid cells that go one by one */
+
+@keyframes cellFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
 }
 
 @media (prefers-color-scheme: light) {
