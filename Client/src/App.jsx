@@ -138,7 +138,7 @@ function App() {
           });
           const keyCells = document.querySelectorAll(".key");
           keyCells.forEach((keyCell) => {
-            keyCell.classList.remove("green", "yellow", "gray");
+            keyCell.classList.remove("keyGreen", "keyYellow", "keyGray");
           });
           setN(0);
           setIsGameOver(true);
@@ -151,7 +151,7 @@ function App() {
           });
           const keyCells = document.querySelectorAll(".key");
           keyCells.forEach((keyCell) => {
-            keyCell.classList.remove("green", "yellow", "gray");
+            keyCell.classList.remove("keyGreen", "keyYellow", "keyGray");
           });
           setN(0);
           setIsGameOver(true);
