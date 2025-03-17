@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { IconButton, Drawer, Stack, Button } from "@mui/material";
+import {
+  IconButton,
+  Drawer,
+  Stack,
+  Button,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Dialog,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerList from "./components/Drawer";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
@@ -13,9 +22,12 @@ function App() {
   const [grid, setGrid] = useState(Array(30).fill(null));
   const [open, setOpen] = useState(false);
   const [word, setWord] = useState("");
+  const [url, setUrl] = useState("/api/post/result/");
   const [n, setN] = useState(0);
   const [isEnterClicked, setIsEnterClicked] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
   const keys = [
     "Q",
     "W",
@@ -58,15 +70,50 @@ function App() {
     fetchRandomWord();
   }, [isGameOver]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch("/api/get/result", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      setLeaderboard(data);
+      console.log(data);
+    }
+    fetchData();
+  }
+  , [isGameOver]);
+
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+  
   const toggleDrawer = (newOpen) => {
     setOpen(newOpen);
+  };
+
+  const handleSubmit = async (link) => {
+    const response = await fetch(link, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log(data);
   };
 
   const handleKeyClick = (key) => {
     const currentRow = Math.floor(n / 5);
     const startOfRow = currentRow * 5;
     const endOfRow = startOfRow + 5;
-  
+
     if (key === "BACK") {
       if (n > startOfRow) {
         setGrid((prev) => {
@@ -76,28 +123,30 @@ function App() {
         });
         setN(n - 1);
       } else if (n === startOfRow) {
-        setIsEnterClicked(false); 
+        setIsEnterClicked(false);
       }
       return;
     }
-  
+
     if (key === "ENTER") {
       setIsEnterClicked(true);
       if (n === startOfRow) {
         const guess = grid.slice(startOfRow - 5, startOfRow).join("");
         console.log("Your guess:", guess);
         console.log("Target Word:", word);
-  
+
         let guessObject = {};
-  
+
         const guessArray = guess.split("");
         const wordArray = word.split("");
-        
+
         guessArray.forEach((letter, index) => {
-            if (wordArray[index] === letter) {
+          if (wordArray[index] === letter) {
             guessObject[letter] = "green";
-            console.log(index+startOfRow-5, "green", letter);
-            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            console.log(index + startOfRow - 5, "green", letter);
+            const cell = document.querySelector(
+              `.cell${index + startOfRow - 5}`
+            );
             const keyIndex = keys.indexOf(letter);
             const keyCell = document.querySelector(`.n${keyIndex}`);
             keyCell.classList.remove("keyYellow", "keyGray");
@@ -106,8 +155,10 @@ function App() {
             cell.classList.add("green");
           } else if (wordArray.includes(letter)) {
             guessObject[letter] = "yellow";
-            console.log(index+startOfRow-5, "yellow", letter);
-            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            console.log(index + startOfRow - 5, "yellow", letter);
+            const cell = document.querySelector(
+              `.cell${index + startOfRow - 5}`
+            );
             const keyIndex = keys.indexOf(letter);
             const keyCell = document.querySelector(`.n${keyIndex}`);
             keyCell.classList.remove("keyGray");
@@ -116,21 +167,25 @@ function App() {
             cell.classList.add("yellow");
           } else {
             guessObject[letter] = "gray";
-            console.log(index+startOfRow-5, "gray", letter);
-            const cell = document.querySelector(`.cell${index+startOfRow-5}`);
+            console.log(index + startOfRow - 5, "gray", letter);
+            const cell = document.querySelector(
+              `.cell${index + startOfRow - 5}`
+            );
             const keyIndex = keys.indexOf(letter);
             const keyCell = document.querySelector(`.n${keyIndex}`);
             keyCell.classList.add("keyGray");
             cell.classList.add("gray");
           }
         });
-  
+
         console.log("Guess Object:", guessObject);
-  
+
         setN(startOfRow);
-  
+
         if (guess === word) {
           alert("🎉 Congratulations! You guessed the word!");
+          setUrl("/api/post/result/win");
+          handleSubmit(url);
           setGrid(Array(30).fill(null));
           const cells = document.querySelectorAll(".cell");
           cells.forEach((cell) => {
@@ -144,6 +199,8 @@ function App() {
           setIsGameOver(true);
         } else if (n >= 30) {
           alert("Game Over! The word was: " + word);
+          setUrl("/api/post/result/loss");
+          handleSubmit(url);
           setGrid(Array(30).fill(null));
           const cells = document.querySelectorAll(".cell");
           cells.forEach((cell) => {
@@ -159,18 +216,18 @@ function App() {
       }
       return;
     }
-  
+
     if (
       n >= 30 ||
       (n == 5 && !isEnterClicked && key === "BACK") ||
       (n == 10 && !isEnterClicked && key === "BACK") ||
       (n == 15 && !isEnterClicked && key === "BACK") ||
       (n == 20 && !isEnterClicked && key === "BACK") ||
-      (n == 25 && !isEnterClicked && key === "BACK") 
+      (n == 25 && !isEnterClicked && key === "BACK")
     ) {
       return;
     }
-  
+
     if (n < endOfRow) {
       setIsEnterClicked(false);
       setIsGameOver(false);
@@ -195,7 +252,18 @@ function App() {
 
         <Stack direction="row" spacing={3}>
           <LightbulbIcon sx={{ fontSize: 30, cursor: "pointer" }} />
-          <BarChartOutlinedIcon sx={{ fontSize: 30, cursor: "pointer" }} />
+            <button onClick={handleDialogOpen}>
+              <BarChartOutlinedIcon sx={{ fontSize: 30, cursor: "pointer" }} />
+            </button>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+              <DialogTitle>Leaderboard</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  <p>Wins: {leaderboard.wins}</p>
+                  <p>Losses: {leaderboard.losses}</p>
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
           <HelpOutlineIcon sx={{ fontSize: 30, cursor: "pointer" }} />
           <SettingsIcon sx={{ fontSize: 30, cursor: "pointer" }} />
           <Button variant="outlined">Subscribe to Games</Button>

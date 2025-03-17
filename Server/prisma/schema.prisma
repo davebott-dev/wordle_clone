@@ -12,3 +12,9 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Leaderboard {
+  id     String @id @default(uuid())
+  wins   Int    @default(0)
+  losses Int    @default(0)
+}

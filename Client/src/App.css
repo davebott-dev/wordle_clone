@@ -143,8 +143,14 @@ a{
   background-color: #3a3a3c;
   color: white;
 }
-/* figure out how to make a flipping animation for the grid cells that go one by one */
-
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
 @keyframes cellFlip {
   0% {
     transform: rotateY(0deg);
